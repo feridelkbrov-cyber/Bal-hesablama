@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İmtahana Giriş Balı Kalkulyatoru</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --text: #333333;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #eaf2f8;
+            border-left: 5px solid var(--accent);
+            border-radius: 4px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .result-detail {
+            font-size: 13px;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .small-text {
+            font-size: 11px;
+            color: #777;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>İmtahana Giriş Balı Kalkulyatoru</h2>
+
+    <!-- Davamiyyət -->
+    <div class="form-group">
+        <label>Davamiyyət (Qayıb saatı)</label>
+        <div class="row">
+            <div class="col">
+                <input type="number" id="qayib" placeholder="Qayıb saatı" min="0" value="0">
+            </div>
+            <div class="col">
+                <input type="number" id="umumiSaat" placeholder="Ümumi dərs saatı" value="60">
+            </div>
+        </div>
+        <div class="small-text">Maksimum 10 bal üzərindən hesablanır.</div>
+    </div>
+
+    <!-- Kollokvium -->
+    <div class="form-group">
+        <label>Kollokvium Qiymətləri (vergüllə ayırın)</label>
+        <input type="text" id="kollokvium" placeholder="Məsələn: 7, 8, 6">
+        <div class="small-text">Orta qiymət tapılaraq 0.6 əmsalına vurulur.</div>
+    </div>
+
+    <!-- Məşğələ -->
+    <div class="form-group">
+        <label>Məşğələ Dərsləri Qiymətləri (vergüllə ayırın)</label>
+        <input type="text" id="mesgele" placeholder="Məsələn: 7, 8, 6">
+        <div class="small-text">Orta qiymət tapılaraq 0.4 əmsalına vurulur.</div>
+    </div>
+
+    <!-- Laboratoriya -->
+    <div class="form-group">
+        <label>Laboratoriya İşləri</label>
+        <div class="row">
+            <div class="col">
+                <input type="number" id="labTehvil" placeholder="Təhvil verilən lab sayı" min="0">
+            </div>
+            <div class="col">
+                <input type="number" id="labUmumi" placeholder="Nəzərdə tutulan lab sayı" value="10">
+            </div>
+        </div>
+        <div class="small-text">Düzgün nisbət tapılaraq 0.4 əmsalına vurulur.</div>
+    </div>
+
+    <!-- Sərbəst İş -->
+    <div class="form-group">
+        <label>Sərbəst İş Balı (Maksimum 10)</label>
+        <input type="number" id="serbest" placeholder="Məsələn: 10" min="0" max="10" value="10">
+        <div class="small-text">Maksimum 10 bal</div>
+    </div>
+
+    <!-- Kurs İşi -->
+    <div class="form-group">
+        <label>Kurs İşi / Əlavə Bal Statusu</label>
+        <select id="kursIsiStatus">
+            <option value="yoxdur">Kurs işi yoxdur</option>
+            <option value="labVar">Kurs işi var (Laboratoriya + Kollokvium cəmi × 2)</option>
+            <option value="mesgeleVar">Kurs işi var (Məşğələ + Kollokvium cəmi × 2)</option>
+        </select>
+    </div>
+
+    <button onclick="hesabla()">Giriş Balını Hesabla</button>
+
+    <div class="result-box" id="resultBox" style="display: none;">
+        <div class="result-title" id="yekunBal">Giriş Balı: 0</div>
+        <div class="result-detail" id="etrafliXatirlatma"></div>
+    </div>
+</div>
+
+<script>
+    function parseArrayInput(id) {
+        const val = document.getElementById(id).value.trim();
+        if (!val) return [];
+        return val.split(',').map(num => parseFloat(num.trim())).filter(n => !isNaN(n));
+    }
+
+    function hesabla() {
+        // 1. Davamiyyət
+        const qayib = parseFloat(document.getElementById('qayib').value) || 0;
+        const umumiSaat = parseFloat(document.getElementById('umumiSaat').value) || 60;
+        let davamiyyetBal = 10 - ((qayib / umumiSaat) * 10);
+        davamiyyetBal = Math.max(0, Math.round(davamiyyetBal));
+
+        // 2. Kollokvium
+        const kolArr = parseArrayInput('kollokvium');
+        let kolBal = 0;
+        if (kolArr.length > 0) {
+            const kolOrta = kolArr.reduce((a, b) => a + b, 0) / kolArr.length;
+            kolBal = kolOrta * 0.6;
+        }
+
+        // 3. Məşğələ
+        const mesgeleArr = parseArrayInput('mesgele');
+        let mesgeleBal = 0;
+        if (mesgeleArr.length > 0) {
+            const mesgeleOrta = mesgeleArr.reduce((a, b) => a + b, 0) / mesgeleArr.length;
+            mesgeleBal = mesgeleOrta * 0.4;
+        }
+
+        // 4. Laboratoriya
+        const labTehvil = parseFloat(document.getElementById('labTehvil').value) || 0;
+        const labUmumi = parseFloat(document.getElementById('labUmumi').value) || 10;
+        let labBal = 0;
+        if (labUmumi > 0 && labTehvil > 0) {
+            labBal = ((labTehvil / labUmumi) * 10) * 0.4;
+        }
+
+        // Akademik cəmlənmə
+        let akademikYekun = 0;
+        if (mesgeleArr.length > 0 && labUmumi > 0 && labTehvil > 0) {
+            akademikYekun = (kolBal + mesgeleBal + labBal) * 1.5; 
+        } else if (mesgeleArr.length > 0) {
+            akademikYekun = (kolBal + mesgeleBal) * 3;
+        } else if (labUmumi > 0 && labTehvil > 0) {
+            akademikYekun = (kolBal + labBal) * 3;
+        }
+
+        // 5. Sərbəst İş
+        const serbestBal = Math.min(10, parseFloat(document.getElementById('serbest').value) || 0);
+
+        // 6. Kurs İşi
+        const kursStatus = document.getElementById('kursIsiStatus').value;
+        let kursBal = 0;
+
+        if (kursStatus === 'labVar') {
+            kursBal = (kolBal + labBal) * 2;
+        } else if (kursStatus === 'mesgeleVar') {
+            kursBal = (kolBal + mesgeleBal) * 2;
+        }
+
+        // Yekun Bal
+        let umumiGirisBal = davamiyyetBal + akademikYekun + serbestBal + kursBal;
+        umumiGirisBal = Math.min(50, umumiGirisBal);
+
+        document.getElementById('resultBox').style.display = 'block';
+        document.getElementById('yekunBal').innerText = `Ümumi İmtahana Giriş Balı: ${umumiGirisBal.toFixed(2)}`;
+        document.getElementById('etrafliXatirlatma').innerHTML = `
+            <strong>Təfərrüat:</strong><br>
+            • Davamiyyət: ${davamiyyetBal} bal<br>
+            • Dərs/Kollokvium üzrə toplanan bal: ${akademikYekun.toFixed(2)} bal<br>
+            • Sərbəst iş: ${serbestBal} bal<br>
+            ${kursStatus !== 'yoxdur' ? `• Kurs işi: ${kursBal.toFixed(2)} bal` : ''}
+        `;
+    }
+</script>
+
+</body>
+</html>
